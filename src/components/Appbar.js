@@ -1,0 +1,56 @@
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import ChatIcon from '@mui/icons-material/Chat';
+import IconButton from '@mui/material/Button'
+import Button from '@mui/material/Button';
+
+export default function Appbar() {
+
+  const [sessionID, setSessionID] = React.useState('') 
+
+  React.useEffect(() => {
+    setSessionID(localStorage.getItem('sessionID'))
+  },[sessionID])
+
+
+
+  const logout = () => {
+    localStorage.removeItem('sessionID')
+    window.location.reload(false);
+  }
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar sx={{backgroundColor:'#efefef'}} position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <IconButton
+            size="large"
+            edge="start"
+            color="secondary"
+            aria-label="menu"
+            sx={{ mr: 2, fontSize:'13px'}}
+          >
+            <ChatIcon/>Notify
+          </IconButton>
+          </Typography>
+          {
+            sessionID &&
+            <div>
+              <Button sx={{color:'#555555'}}>
+              Welcome, {sessionID}
+              </Button>
+              <Button sx={{color:'red'}} onClick={logout}>
+                Logout
+              </Button> 
+            </div> 
+          
+          }
+          
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
+}
