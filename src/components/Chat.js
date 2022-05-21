@@ -8,6 +8,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import avatar4 from '../assets/avatar/4.png'
+import moment from 'moment'
 import { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import socket from '../socket';
@@ -28,9 +29,10 @@ const Chat = () => {
     const sendMessage = (e) => {
         e.preventDefault();
         
-        if(socket.emit('privateMessage', {message, to: id})){
+        if(message){
+            socket.emit('privateMessage', {message, to: id})
             console.log(message, id, socket.id)
-            setChat([...chat, {message, to:id, from:socket.id}]);
+            setChat([...chat, {message, time: moment().format('h:mm a'), to:id, from:socket.id}]);
             setMessage('')
         }
         

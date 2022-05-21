@@ -49,7 +49,8 @@ export default function AlignItemsList() {
     <List sx={{borderRadius:'10px', width: '100%',  bgcolor: 'background.paper' }}>
       {users.map((payload, index) => {
           return (
-            <ListItem key={index} onClick={() => { navigate(`/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
+          <div>
+            <ListItem key={index} onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
               <ListItemAvatar>
                   <Badge color="secondary" badgeContent=" " overlap="circular" variant="dot"
                     anchorOrigin={{
@@ -91,6 +92,8 @@ export default function AlignItemsList() {
                 }
               />
             </ListItem>
+            <Divider variant="inset" component="li"></Divider>
+          </div>
         )
         
       })}
