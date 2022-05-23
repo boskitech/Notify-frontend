@@ -5,35 +5,38 @@ import Chatlist from '../components/Chatlist';
 import { Outlet } from 'react-router';
 import socket from '../socket';
 import { useEffect} from 'react';
+import { useNavigate } from "react-router-dom";
 
 
 const Home = () => {
+  const navigate = useNavigate()
 
-
-useEffect(() => {
-    
-  socket.on("session", ({ sessionID }) => {
-    console.log('new session', socket.id)
-    socket.auth = { sessionID };
-    localStorage.setItem("sessionID", sessionID);
-  });
-
-  const sessionID = localStorage.getItem("sessionID");
-
-  if(sessionID){
-    console.log('Session id detected')
-    socket.auth = { sessionID };
-    socket.connect();
-  }else{
-    console.log('Session id not detected')
-  }
-
-  socket.on("connect_error", (err) => {
-    if (err.message === "invalid username") {
-      console.log('Username error') 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if(!token){
+      navigate('/login')
     }
-  });
-}) 
+
+    socket.on("session", ({ sessionID }) => {
+      console.log('new session', socket.id)
+      socket.auth = { sessionID };
+      localStorage.setItem("sessionID", sessionID);
+    });
+
+    const sessionID = localStorage.getItem("sessionID");
+
+    if(sessionID){
+      console.log('Session id detected')
+      socket.auth = { sessionID };
+      socket.connect();
+    }
+
+    socket.on("connect_error", (err) => {
+      if (err.message === "invalid username") {
+        console.log('Username error') 
+      }
+    });
+  },[navigate]) 
 
   return (
     <div>

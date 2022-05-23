@@ -13,46 +13,73 @@ import avatar4 from '../assets/avatar/4.png'
 import { useNavigate } from "react-router-dom";
 import socket from '../socket';
 import { useState, useEffect } from 'react';
+import {  userConnected,  
+          userLeaves, 
+          activeSessionUsers, 
+          fetchUsers, 
+          postStatus, 
+          selectOfflineUsers
+        } from "../features/usersSlice"
+import { useDispatch, useSelector } from "react-redux"
 
-export default function AlignItemsList() {
+export default function ChatList() {
 
-  const [users, setUsers] = useState([])
-
+  const offlineUsers = useSelector(selectOfflineUsers)
+  const status = useSelector(postStatus)
+  const [activeUsers, setActiveUsers] = useState([])
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchUsers())
+    }
+  }, [status, dispatch])
+
+  useEffect(() => {
+
     socket.on("users", (payload) => {
       payload.forEach((user) => {
         user.self = user.id === socket.id;
       });
 
-      setUsers(payload.sort((a, b) => {
+      setActiveUsers(payload.sort((a, b) => {
         if (a.self) return -1;
         if (b.self) return 1;
         if (a.username < b.username) return -1;
         return a.username > b.username ? 1 : 0;
       }));
 
+      dispatch(activeSessionUsers(payload))
+
     });
   
     socket.on("user connected", (user) => {
-      setUsers([user, ...users])
+      setActiveUsers([user, ...activeUsers])
+      dispatch(userConnected(user))
     });
 
     socket.on("userleaves", (payload) => {
-      setUsers(users.filter((user) => user.id !== payload))
+      setActiveUsers(activeUsers.filter((user) => user.id !== payload))
+      dispatch(userLeaves(payload))
     });
   
-  },[users])
+  })
 
   return (
     <List sx={{borderRadius:'10px', width: '100%',  bgcolor: 'background.paper' }}>
-      {users.map((payload, index) => {
+      
+      {activeUsers.map((payload, index) => {
           return (
-          <div>
-            <ListItem key={index} onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
+          <div key={index}> 
+            <ListItem  onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
               <ListItemAvatar>
-                  <Badge color="secondary" badgeContent=" " overlap="circular" variant="dot"
+                  <Badge sx={{
+                      "& .MuiBadge-badge": {
+                        color: "lightgreen",
+                        backgroundColor: "green"
+                      }
+                    }} badgeContent=" " overlap="circular" variant="dot"
                     anchorOrigin={{
                       vertical: 'top',
                       horizontal: 'right',
@@ -96,6 +123,49 @@ export default function AlignItemsList() {
           </div>
         )
         
+      })}
+
+      {offlineUsers.map((payload, index) => {
+          return (
+          <div key={index}> 
+            <ListItem  onClick={() => { navigate(`/chat/${payload._id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
+              <ListItemAvatar>
+                    <Avatar alt="Jamal" src={avatar4} />
+              </ListItemAvatar>
+              <ListItemText 
+                primary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ color:'#222222', display: 'inline' }}
+                      component="span"
+                      variant="body6"
+                    >
+                      {payload.username}
+                    </Typography>
+                    <Typography
+                      sx={{ float:'right', fontSize:'13px', color:'#222222', display: 'inline' }}
+                      component="span"
+                    >
+                      4:00pm
+                    </Typography>
+                  </React.Fragment>
+                }
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ color:'#555555', display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                    >
+                      It's nice working with you
+                    </Typography>
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+            <Divider variant="inset" component="li"></Divider>
+          </div>
+        )
       })}
     </List>
   )

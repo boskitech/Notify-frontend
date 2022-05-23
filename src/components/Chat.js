@@ -12,35 +12,75 @@ import moment from 'moment'
 import { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import socket from '../socket';
+import { useSelector, useDispatch } from "react-redux"
+import { selectAllUsers, fetchUsers, selectOnlineUsers, postStatus} from "../features/usersSlice"
 
 const Chat = () => {
+    const allUsers = useSelector(selectAllUsers)
+    // const [user, setUser] = useState([])
+    const status = useSelector(postStatus)
+    const onlineUsers = useSelector(selectOnlineUsers)
     const [chat, setChat] = useState([])
     const [message, setMessage] = useState('')
+    const dispatch = useDispatch()
     let params = useParams()
     let id = params.id
 
+    const user = allUsers.find(user => user._id === id)
+    const activeStatus = onlineUsers.filter(res => res.id === id)
+    
     useEffect(() => {
+        if (status === 'idle') {
+            dispatch(fetchUsers())
+        }
         socket.on("privateMessage", (payload) => {
             console.log(payload)
             setChat([...chat, payload]);
         });
-    })
+    },[chat, activeStatus, status, dispatch])
 
     const sendMessage = (e) => {
         e.preventDefault();
-        
         if(message){
             socket.emit('privateMessage', {message, to: id})
-            console.log(message, id, socket.id)
             setChat([...chat, {message, time: moment().format('h:mm a'), to:id, from:socket.id}]);
             setMessage('')
         }
-        
     } 
 
   return (
     <Box sx={{width:'97%', borderRadius:'12px', float:'left', height:'100vh', backgroundColor:'#fff', overflow:'auto'}}>
         <Box sx={{height:'700px', overflow:'auto'}}>
+            <ListItem  alignItems="flex-start" sx={{backgroundColor:'#dedede', cursor:'pointer'}}>
+                <ListItemAvatar>
+                      <Avatar alt="Jamal" src={avatar4} />
+                </ListItemAvatar>
+                <ListItemText 
+                  primary={
+                    <React.Fragment>
+                      <Typography
+                        sx={{ color:'#222222', display: 'inline' }}
+                        component="span"
+                        variant="body6"
+                      >
+                          {user ? user.username : ""}
+                      </Typography>
+                    </React.Fragment>
+                  }
+                  secondary={
+                    <React.Fragment>
+                      <Typography
+                        sx={{ color:'#555555', display: 'inline' }}
+                        component="span"
+                        variant="body2"
+                      >
+                        {activeStatus.length > 0 ? "Online" : "Offline"}
+                      </Typography>
+                    </React.Fragment>
+                  }
+                />
+            </ListItem>
+
             <List sx={{width:'100%'}}>
                 {chat.map((payload, index) => {
                     if(payload.from === id && payload.to === socket.id){

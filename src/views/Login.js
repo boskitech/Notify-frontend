@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
-;
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import loginImg from '../assets/pngs/login_img.png'
@@ -11,19 +10,67 @@ import IconButton from '@mui/material/Button'
 import socket from '../socket';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect} from 'react';
+import { 
+  useAddNewUserMutation, 
+  useLoginUserMutation,
+} from '../features/apiSlice'
 
 const Login = () => {
-  const navigate = useNavigate()
 
+  const navigate = useNavigate()
   const [login, setLogin] = useState(true)
-  const [username, setUsername] = useState('')
+  const [usersname, setUsersname] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [regPass, setRegPass] = useState('')
   const [confirmPass, setConfirmPass] = useState('')
+  const [signinUser] = useLoginUserMutation()
+  const [saveUser] = useAddNewUserMutation()
 
-  useEffect(() => {
-    
+
+  const addUser = async () => {
+    const meta = {
+        username: usersname,
+        email: email,
+        password: regPass
+    }
+    if (email && regPass && confirmPass && usersname) {
+      try {
+        const data = await saveUser(meta).unwrap()
+        if(data.message === 'success'){
+          setLogin(true)
+        }
+      }catch(err){
+        console.log('Failed to add user: ', err)
+      }
+    }
+  }
+
+  const loginUser = async (e) => {
+    e.preventDefault();
+
+    const meta = {
+        email: email,
+        password: password
+    }
+    if(email && password) {
+      try {
+        const data = await signinUser(meta).unwrap();
+        if(data.message === 'success'){
+          socket.auth = { id:data.user._id, username:data.user.username };
+          localStorage.setItem('token', data.token)
+          if(socket.connect()){
+            navigate('/chat')
+          };
+        }
+      }catch(err){
+        console.log('Failed to login user: ', err)
+      }
+    }
+  }
+
+  useEffect( () => {
+
     socket.on("session", ({ sessionID, id }) => {
       console.log('new session', sessionID)
       socket.auth = { sessionID };
@@ -32,8 +79,9 @@ const Login = () => {
     });
 
     const sessionID = localStorage.getItem("sessionID");
+    const token = localStorage.getItem("token");
 
-    if(sessionID){
+    if(token){
       console.log('Session id detected')
       socket.auth = { sessionID };
       socket.connect();
@@ -47,57 +95,58 @@ const Login = () => {
         console.log('Username error') 
       }
     });
-  }) 
-
-  const addUser = async () => {
-    const meta = {
-      username: username,
-      email: email,
-      password: regPass
-    }
-
-    const res = await fetch('http://localhost:5000/api/users/register', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(meta)
-    }) 
-
-    const data = await res.json()
-
-    if(data.message === 'success'){
-      setLogin(true)
-    }
-  }
+  },[navigate]) 
 
 
-  const loginUser = async () => {
-    const meta = {
-      email: email,
-      password: password
-    }
+  // const addUser = async () => {
+  //   const meta = {
+  //     username: username,
+  //     email: email,
+  //     password: regPass
+  //   }
 
-    const res = await fetch('http://localhost:5000/api/users/login', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(meta)
-    })  
+  //   const res = await fetch('http://localhost:5000/api/users/register', {
+  //     method: 'POST',
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //     body: JSON.stringify(meta)
+  //   }) 
 
-    const data = await res.json()
+  //   const data = await res.json()
+
+  //   if(data.message === 'success'){
+  //     setLogin(true)
+  //   }
+  // }
 
 
-    if(data.message === 'success'){
-     localStorage.setItem('token', data.token)
-      const username = data.user.username
-      const id = data.user._id
-      socket.auth = { id, username };
-      socket.connect();
-      navigate('/chat')
-    }
-  }
+  // const loginUser = async () => {
+  //   const meta = {
+  //     email: email,
+  //     password: password
+  //   }
+
+  //   const res = await fetch('http://localhost:5000/api/users/login', {
+  //     method: 'POST',
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //     body: JSON.stringify(meta)
+  //   })  
+
+  //   const data = await res.json()
+
+
+  //   if(data.message === 'success'){
+  //    localStorage.setItem('token', data.token)
+  //     const username = data.user.username
+  //     const id = data.user._id
+  //     socket.auth = { id, username };
+  //     socket.connect();
+  //     navigate('/chat')
+  //   }
+  // }
 
 
   return (
@@ -137,12 +186,12 @@ const Login = () => {
           <i style={{position:'absolute', padding:'13px 13px 13px 25px', color:'#555555'}}><EmailIcon></EmailIcon></i>
           <input type="text" value={email} onChange={ (e) => setEmail(e.target.value)} placeholder="Email" style={{width:'60%', textAlign:'center', padding:'10px 0px 10px 20px', backgroundColor:'#dfdfdf',  fontSize:'13px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/><br/>
           <i style={{position:'absolute', padding:'13px 13px 13px 25px', color:'#555555'}}><PersonIcon></PersonIcon></i>
-          <input type="text" value={username} onChange={ (e) => setUsername(e.target.value)} placeholder="Username" style={{width:'60%', textAlign:'center', padding:'10px 0px 10px 20px', backgroundColor:'#dfdfdf',  fontSize:'13px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/><br/>
+          <input type="text" value={usersname} onChange={ (e) => setUsersname(e.target.value)} placeholder="Username" style={{width:'60%', textAlign:'center', padding:'10px 0px 10px 20px', backgroundColor:'#dfdfdf',  fontSize:'13px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/><br/>
           <i style={{position:'absolute', padding:'13px 13px 13px 25px', color:'#555555'}}><LockIcon></LockIcon></i>
           <input type="text" value={regPass} onChange={ (e) => setRegPass(e.target.value)} placeholder="Password" style={{width:'60%', textAlign:'center',padding:'10px 0px 10px 20px', backgroundColor:'#dfdfdf',  fontSize:'13px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/><br/>
           <i style={{position:'absolute', padding:'13px 13px 13px 25px', color:'#555555'}}><LockIcon></LockIcon></i>
           <input type="text" value={confirmPass}onChange={ (e) => setConfirmPass(e.target.value)} placeholder="Confirm Password" style={{width:'60%', textAlign:'center',padding:'10px 0px 10px 20px', backgroundColor:'#dfdfdf',  fontSize:'13px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/><br/>
-          <button onClick={addUser} style={{width:'62%', cursor:'pointer', padding:'7px', fontSize:'20px', fontStyle:'bold', backgroundColor:'green', color:'white', borderRadius:'25px', height:'50px', border:'none'}}>    
+          <button onClick={addUser} style={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'}, width:'62%', cursor:'pointer', padding:'7px', fontSize:'20px', fontStyle:'bold', backgroundColor:'green', color:'white', borderRadius:'25px', height:'50px', border:'none'}}>    
             <b>CREATE</b>
           </button><br/>
           <Button sx={{color:'#777777', marginTop:'20px'}} onClick={() => setLogin(true)}>LOGIN <ArrowRightAltIcon></ArrowRightAltIcon> </Button>     
