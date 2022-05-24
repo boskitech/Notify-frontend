@@ -27,7 +27,6 @@ const Login = () => {
   const [signinUser] = useLoginUserMutation()
   const [saveUser] = useAddNewUserMutation()
 
-
   const addUser = async () => {
     const meta = {
         username: usersname,
@@ -48,7 +47,6 @@ const Login = () => {
 
   const loginUser = async (e) => {
     e.preventDefault();
-
     const meta = {
         email: email,
         password: password
@@ -59,6 +57,7 @@ const Login = () => {
         if(data.message === 'success'){
           socket.auth = { id:data.user._id, username:data.user.username };
           localStorage.setItem('token', data.token)
+          localStorage.setItem('user', JSON.stringify(data.user))
           if(socket.connect()){
             navigate('/chat')
           };
@@ -70,9 +69,7 @@ const Login = () => {
   }
 
   useEffect( () => {
-
     socket.on("session", ({ sessionID, id }) => {
-      console.log('new session', sessionID)
       socket.auth = { sessionID };
       localStorage.setItem("sessionID", sessionID);
       socket.id = id;

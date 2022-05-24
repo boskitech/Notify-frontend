@@ -18,7 +18,6 @@ const Home = () => {
     }
 
     socket.on("session", ({ sessionID }) => {
-      console.log('new session', socket.id)
       socket.auth = { sessionID };
       localStorage.setItem("sessionID", sessionID);
     });

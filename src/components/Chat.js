@@ -17,7 +17,6 @@ import { selectAllUsers, fetchUsers, selectOnlineUsers, postStatus} from "../fea
 
 const Chat = () => {
     const allUsers = useSelector(selectAllUsers)
-    // const [user, setUser] = useState([])
     const status = useSelector(postStatus)
     const onlineUsers = useSelector(selectOnlineUsers)
     const [chat, setChat] = useState([])
@@ -34,7 +33,6 @@ const Chat = () => {
             dispatch(fetchUsers())
         }
         socket.on("privateMessage", (payload) => {
-            console.log(payload)
             setChat([...chat, payload]);
         });
     },[chat, activeStatus, status, dispatch])
@@ -51,7 +49,7 @@ const Chat = () => {
   return (
     <Box sx={{width:'97%', borderRadius:'12px', float:'left', height:'100vh', backgroundColor:'#fff', overflow:'auto'}}>
         <Box sx={{height:'700px', overflow:'auto'}}>
-            <ListItem  alignItems="flex-start" sx={{backgroundColor:'#dedede', cursor:'pointer'}}>
+            <ListItem  alignItems="flex-start" sx={{backgroundColor:'#dfdfdd', cursor:'pointer'}}>
                 <ListItemAvatar>
                       <Avatar alt="Jamal" src={avatar4} />
                 </ListItemAvatar>
@@ -145,7 +143,6 @@ const Chat = () => {
                         </ListItem>
                         )
                     }
-                   
                 })}
             </List>
 

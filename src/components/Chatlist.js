@@ -6,9 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-// import avatar1 from '../assets/avatar/1.png'
 import Badge from '@mui/material/Badge';
-// import avatar3 from '../assets/avatar/3.png'
 import avatar4 from '../assets/avatar/4.png'
 import { useNavigate } from "react-router-dom";
 import socket from '../socket';
@@ -27,8 +25,12 @@ export default function ChatList() {
   const offlineUsers = useSelector(selectOfflineUsers)
   const status = useSelector(postStatus)
   const [activeUsers, setActiveUsers] = useState([])
+  const data = localStorage.getItem("user")
+  const user = JSON.parse(data)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  const realUsers = activeUsers.filter(res => res.id !== user._id)
 
   useEffect(() => {
     if (status === 'idle') {
@@ -37,7 +39,6 @@ export default function ChatList() {
   }, [status, dispatch])
 
   useEffect(() => {
-
     socket.on("users", (payload) => {
       payload.forEach((user) => {
         user.self = user.id === socket.id;
@@ -49,9 +50,7 @@ export default function ChatList() {
         if (a.username < b.username) return -1;
         return a.username > b.username ? 1 : 0;
       }));
-
       dispatch(activeSessionUsers(payload))
-
     });
   
     socket.on("user connected", (user) => {
@@ -68,8 +67,7 @@ export default function ChatList() {
 
   return (
     <List sx={{borderRadius:'10px', width: '100%',  bgcolor: 'background.paper' }}>
-      
-      {activeUsers.map((payload, index) => {
+      {realUsers.map((payload, index) => {
           return (
           <div key={index}> 
             <ListItem  onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
@@ -122,7 +120,6 @@ export default function ChatList() {
             <Divider variant="inset" component="li"></Divider>
           </div>
         )
-        
       })}
 
       {offlineUsers.map((payload, index) => {

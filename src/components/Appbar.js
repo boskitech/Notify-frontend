@@ -12,12 +12,14 @@ import { useNavigate } from "react-router-dom";
 export default function Appbar() {
 
   const navigate = useNavigate()
-
+  const data = localStorage.getItem("user")
   const token = localStorage.getItem('token')
+  const user = JSON.parse(data)
 
   const logout = () => {
     localStorage.removeItem('sessionID')
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     socket.disconnect(true)
     navigate('/login')
   }
@@ -40,7 +42,7 @@ export default function Appbar() {
             token &&
             <div>
               <Button sx={{color:'#555555'}}>
-              Welcome
+              Welcome {user.username}
               </Button>
               <Button sx={{color:'red'}} onClick={logout}>
                 Logout
