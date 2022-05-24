@@ -143,6 +143,10 @@ const Chat = () => {
                                     />
                                 </ListItem>
                                 )
+                            }else{
+                                return (
+                                    <div>No message</div>
+                                )
                             }
                         })}
                     </List>

@@ -22,7 +22,6 @@ export const loginUser = createAsyncThunk('users/loginUser', async loginPost => 
     return response.data
 })
 
-
 export const activeSessionUsers = createAsyncThunk('users/activeSessionUsers', async activeUsers => {
     return activeUsers
 })
