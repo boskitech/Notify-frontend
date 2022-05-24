@@ -48,8 +48,7 @@ const Home = () => {
                   <Chatlist/>
           </Box>
           <Box sx={{width:'600px', float:'right', height:'100vh', paddingTop:'20px'}}>
-              <button align="right" style={{width:'90px', right:'20px', padding:'7px', float:'right', marginLeft:'10px', position:'relative', display:'block', fontSize:'12px', backgroundColor:'#fff', color:'#555', alignContent:'right', borderRadius:'25px', height:'30px', border:'none', marginTop:'15px', marginBottom:'25px', cursor:'pointer'}}>More</button>
-              <button align="right" style={{width:'120px', right:'20px', padding:'7px', float:'right', position:'relative', display:'block', fontSize:'12px', backgroundColor:'#fff', color:'#555', alignContent:'right', borderRadius:'25px', height:'30px', border:'none', marginTop:'15px', marginBottom:'25px', cursor:'pointer'}}>Clear Chat</button>
+              <Box align="right" onClick={() => navigate('/chat')} sx={{'&:hover': {backgroundColor:'#e26a6a', cursor:'pointer', color:'#efefef'}, width:'80px', textAlign:'center', right:'20px', padding:'10px', float:'right', position:'relative', display:'block', fontSize:'13px', backgroundColor:'#fff', color:'#e26a6a', alignContent:'right', borderRadius:'25px', height:'14px', border:'none', marginTop:'12px', marginBottom:'25px', cursor:'pointer'}}>Close Chat</Box>
               <Outlet/>
           </Box>
         </Card>

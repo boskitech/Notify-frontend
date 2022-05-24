@@ -12,8 +12,8 @@ import moment from 'moment'
 import { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import socket from '../socket';
-import { useSelector, useDispatch } from "react-redux"
-import { selectAllUsers, fetchUsers, selectOnlineUsers, postStatus} from "../features/usersSlice"
+import { useSelector } from "react-redux"
+import { selectAllUsers, selectOnlineUsers, postStatus} from "../features/usersSlice"
 
 const Chat = () => {
     const allUsers = useSelector(selectAllUsers)
@@ -21,7 +21,6 @@ const Chat = () => {
     const onlineUsers = useSelector(selectOnlineUsers)
     const [chat, setChat] = useState([])
     const [message, setMessage] = useState('')
-    const dispatch = useDispatch()
     let params = useParams()
     let id = params.id
 
@@ -29,13 +28,11 @@ const Chat = () => {
     const activeStatus = onlineUsers.filter(res => res.id === id)
     
     useEffect(() => {
-        if (status === 'idle') {
-            dispatch(fetchUsers())
-        }
+      
         socket.on("privateMessage", (payload) => {
             setChat([...chat, payload]);
         });
-    },[chat, activeStatus, status, dispatch])
+    },[chat, activeStatus, status])
 
     const sendMessage = (e) => {
         e.preventDefault();
@@ -80,7 +77,7 @@ const Chat = () => {
                         />
                     </ListItem>
         
-                    <List sx={{width:'100%'}}>
+                    {<List sx={{width:'100%'}}>
                         {chat.map((payload, index) => {
                             if(payload.from === id && payload.to === socket.id){
                                 return (
@@ -145,21 +142,21 @@ const Chat = () => {
                                 )
                             }else{
                                 return (
-                                    <div>No message</div>
+                                    <div></div>
                                 )
                             }
                         })}
-                    </List>
+                    </List>}
         
                 </Box>
                 <Box sx={{position:'fixed', bottom:'0', zIndex:'999'}}>
                     <input type="text" value={message} onChange={ (e) => setMessage(e.target.value)} placeholder="Type a message" style={{width:'485px',marginLeft:'10px', padding:'10px 0px 10px 20px', backgroundColor:'#efefef',  fontSize:'15px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/>
-                    <button align="right" onClick={sendMessage} style={{width:'50px', zIndex:'10', cursor:'pointer', padding:'7px', float:'right', marginLeft:'5px', position:'relative', display:'block', fontSize:'12px', backgroundColor:'green', color:'white', alignContent:'right', borderRadius:'50px', height:'50px', border:'none'}}>         
+                    <Box align="right" onClick={sendMessage} sx={{'&:hover': {backgroundColor:'#00a571', cursor:'pointer'}, width:'25px', zIndex:'10', cursor:'pointer', padding:'13px', float:'right', marginLeft:'5px', position:'relative', display:'block', fontSize:'12px', backgroundColor:'green', color:'white', alignContent:'right', borderRadius:'25px', height:'25px', border:'none'}}>         
                         <SendIcon/>
-                    </button>
+                    </Box>
                 </Box>
             </Box>
-          )
+        )
     }else{
         return (
             <Box sx={{width:'97%', borderRadius:'12px', float:'left', height:'100vh', backgroundColor:'#fff', overflow:'auto'}}>
@@ -167,9 +164,8 @@ const Chat = () => {
                     <h3 style={{margin:'170px',color:'#333333', width:'100%'}}>Click on a user to start a chat</h3>               
                 </Box>
             </Box>
-          )
+        )
     }
-  
 }
 
 export default Chat
