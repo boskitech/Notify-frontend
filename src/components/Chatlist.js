@@ -11,32 +11,41 @@ import avatar4 from '../assets/avatar/4.png'
 import { useNavigate } from "react-router-dom";
 import socket from '../socket';
 import { useState, useEffect } from 'react';
-import { useGetUsersQuery } from '../features/apiSlice'
+import {  userConnected,  
+          userLeaves, 
+          activeSessionUsers, 
+          selectAllUsers,
+          fetchUsers, 
+          postStatus
+        } from "../features/usersSlice"
+import { useDispatch, useSelector } from "react-redux"
 
 export default function ChatList() {
 
+  const allUsers = useSelector(selectAllUsers)
+  const status = useSelector(postStatus)
   const [activeUsers, setActiveUsers] = useState([])
-  const [users, setUsers] = useState([])
   const data = localStorage.getItem("user")
   const user = JSON.parse(data)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
-  const {data: getusers, isSuccess} = useGetUsersQuery()
 
-  const online = activeUsers.filter(res => res.id !== user._id)
-  const offlineUsers = users.filter(o1 => !activeUsers.some(o2 => o1._id === o2.id))
-  const onlineUsers = users.filter(o1 => online.some(o2 => o1._id === o2.id))
+  const realUsers = activeUsers.filter(res => res.id !== user._id)
+  const offlineManchis = allUsers.filter(o1 => !activeUsers.some(o2 => o1._id === o2.id))
 
   useEffect(() => {
-    if(isSuccess){
-      setUsers(getusers)
+    if (status === 'idle') {
+      dispatch(fetchUsers())
     }
-  }, [isSuccess, getusers])
+    console.log(allUsers)
+  }, [status, allUsers, dispatch])
 
   useEffect(() => {
     socket.on("users", (payload) => {
       payload.forEach((user) => {
         user.self = user.id === socket.id;
       });
+      dispatch(activeSessionUsers(payload))
 
       setActiveUsers(payload.sort((a, b) => {
         if (a.self) return -1;
@@ -48,20 +57,23 @@ export default function ChatList() {
   
     socket.on("user connected", (user) => {
       setActiveUsers([user, ...activeUsers])
+      dispatch(fetchUsers())
+      dispatch(userConnected(user))
     });
 
     socket.on("userleaves", (payload) => {
       setActiveUsers(activeUsers.filter((user) => user.id !== payload))
+      dispatch(userLeaves(payload))
     });
   
   })
 
   return (
-    <List sx={{borderRadius:'10px', width: '100%',  bgcolor: 'background.paper' }}>
-      {onlineUsers.map((payload, index) => {
+    <List sx={{borderRadius:'10px', width: '100%', bgcolor: 'background.paper' }}>
+      {realUsers.map((payload, index) => {
           return (
           <div key={index}> 
-            <ListItem  onClick={() => { navigate(`/chat/${payload._id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
+            <ListItem  onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
               <ListItemAvatar>
                   <Badge sx={{
                       "& .MuiBadge-badge": {
@@ -102,7 +114,7 @@ export default function ChatList() {
                       component="span"
                       variant="body2"
                     >
-                      {payload.email}
+                      It's nice working with you
                     </Typography>
                   </React.Fragment>
                 }
@@ -113,7 +125,7 @@ export default function ChatList() {
         )
       })}
 
-      {offlineUsers.map((payload, index) => {
+      {offlineManchis.map((payload, index) => {
           return (
           <div key={index}> 
             <ListItem  onClick={() => { navigate(`/chat/${payload._id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
@@ -145,7 +157,7 @@ export default function ChatList() {
                       component="span"
                       variant="body2"
                     >
-                      {payload.email}
+                      It's nice working with you
                     </Typography>
                   </React.Fragment>
                 }

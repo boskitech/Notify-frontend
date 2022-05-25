@@ -47,7 +47,7 @@ const Chat = () => {
         return (
             <Box sx={{width:'97%', borderRadius:'12px', float:'left', height:'100vh', backgroundColor:'#fff', overflow:'auto'}}>
                 <Box sx={{height:'700px', overflow:'auto'}}>
-                    <ListItem  alignItems="flex-start" sx={{backgroundColor:'#dfdfdd', cursor:'pointer'}}>
+                    <ListItem  alignItems="flex-start" sx={{backgroundColor:'#e9e9e9', cursor:'pointer'}}>
                         <ListItemAvatar>
                               <Avatar alt="Jamal" src={avatar4} />
                         </ListItemAvatar>
@@ -151,7 +151,7 @@ const Chat = () => {
                 </Box>
                 <Box sx={{position:'fixed', bottom:'0', zIndex:'999'}}>
                     <input type="text" value={message} onChange={ (e) => setMessage(e.target.value)} placeholder="Type a message" style={{width:'485px',marginLeft:'10px', padding:'10px 0px 10px 20px', backgroundColor:'#efefef',  fontSize:'15px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/>
-                    <Box align="right" onClick={sendMessage} sx={{'&:hover': {backgroundColor:'#00a571', cursor:'pointer'}, width:'25px', zIndex:'10', cursor:'pointer', padding:'13px', float:'right', marginLeft:'5px', position:'relative', display:'block', fontSize:'12px', backgroundColor:'green', color:'white', alignContent:'right', borderRadius:'25px', height:'25px', border:'none'}}>         
+                    <Box align="right" onClick={sendMessage} sx={{'&:hover': {backgroundColor:'#047c54', cursor:'pointer'}, '&:focus': {border:'1px solid ##333333', cursor:'pointer'}, width:'25px', zIndex:'10', cursor:'pointer', padding:'13px', float:'right', marginLeft:'5px', position:'relative', display:'block', fontSize:'12px', backgroundColor:'#00a571', color:'white', alignContent:'right', borderRadius:'25px', height:'25px', border:'none'}}>         
                         <SendIcon/>
                     </Box>
                 </Box>
