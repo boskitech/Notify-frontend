@@ -2,7 +2,7 @@ import {createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const apiSlice = createApi({
     reducerPath: 'api',
-    baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:5000/api/users'}),
+    baseQuery: fetchBaseQuery({baseUrl: 'https://nottifyserver.herokuapp.com/api/users'}),
     tagTypes: ['User'],
     endpoints: builder => ({
         getUsers: builder.query({

@@ -3,22 +3,22 @@ import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-    const response = await axios.get('http://localhost:5000/api/users/getusers');
+    const response = await axios.get('https://nottifyserver.herokuapp.com/api/users/getusers');
     return response.data;
 })
 
 export const fetchUser = createAsyncThunk('users/fetchUser', async id => {
-    const response = await axios.get(`http://localhost:5000/users/getUser/${id}`)
+    const response = await axios.get(`https://nottifyserver.herokuapp.com/users/getUser/${id}`)
     return response.data
 })
 
 export const addUser = createAsyncThunk('users/addUser', async initialPost => {
-    const response = await axios.post('http://localhost:5000/api/users/register', initialPost)
+    const response = await axios.post('https://nottifyserver.herokuapp.com/api/users/register', initialPost)
     return response.data
 })
 
 export const loginUser = createAsyncThunk('users/loginUser', async loginPost => {
-    const response = await axios.post('http://localhost:5000/api/users/login', loginPost)
+    const response = await axios.post('https://nottifyserver.herokuapp.com/api/users/login', loginPost)
     return response.data
 })
 
