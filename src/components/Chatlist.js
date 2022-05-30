@@ -103,7 +103,7 @@ export default function ChatList() {
                       sx={{ float:'right', fontSize:'13px', color:'#222222', display: 'inline' }}
                       component="span"
                     >
-                      4:00pm
+                      online
                     </Typography>
                   </React.Fragment>
                 }
@@ -114,7 +114,7 @@ export default function ChatList() {
                       component="span"
                       variant="body2"
                     >
-                      It's nice working with you
+                      {payload.email}
                     </Typography>
                   </React.Fragment>
                 }
@@ -146,7 +146,7 @@ export default function ChatList() {
                       sx={{ float:'right', fontSize:'13px', color:'#222222', display: 'inline' }}
                       component="span"
                     >
-                      4:00pm
+                      offline
                     </Typography>
                   </React.Fragment>
                 }
@@ -157,7 +157,7 @@ export default function ChatList() {
                       component="span"
                       variant="body2"
                     >
-                      It's nice working with you
+                      {payload.email}
                     </Typography>
                   </React.Fragment>
                 }
