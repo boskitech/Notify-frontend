@@ -41,11 +41,13 @@ const Login = () => {
     if (email && regPass && confirmPass && usersname) {
       try {
         setLoader(true)
+        setError("")
         const data = await saveUser(meta).unwrap()
         if(data.message === 'success'){
           setLoader(false)
           setLogin(true)
-        }else{
+          setError("Successfully registered. Put in your login details")
+      }else{
           setLoader(false)
           setRegError("Email already in use")
         }
@@ -66,6 +68,7 @@ const Login = () => {
     if(email && password) {
       try {
         setLoader(true)
+        setError("")
         const data = await signinUser(meta).unwrap();
         if(data.message === 'success'){
           socket.auth = { id:data.user._id, username:data.user.username };
