@@ -7,6 +7,7 @@ import loginImg from '../assets/pngs/login_img.jpg'
 import ChatIcon from '@mui/icons-material/Chat';
 import PersonIcon from '@mui/icons-material/Person';
 import IconButton from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress';
 import socket from '../socket';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect} from 'react';
@@ -25,9 +26,11 @@ const Login = () => {
   const [regPass, setRegPass] = useState('')
   const [confirmPass, setConfirmPass] = useState('')
   const [error, setError] = useState('')
+  const [loader, setLoader] = useState(false)
   const [regerror, setRegError] = useState('')
   const [signinUser] = useLoginUserMutation()
   const [saveUser] = useAddNewUserMutation()
+
 
   const addUser = async () => {
     const meta = {
@@ -37,10 +40,13 @@ const Login = () => {
     }
     if (email && regPass && confirmPass && usersname) {
       try {
+        setLoader(true)
         const data = await saveUser(meta).unwrap()
         if(data.message === 'success'){
+          setLoader(false)
           setLogin(true)
         }else{
+          setLoader(false)
           setRegError("Email already in use")
         }
       }catch(err){
@@ -59,6 +65,7 @@ const Login = () => {
     }
     if(email && password) {
       try {
+        setLoader(true)
         const data = await signinUser(meta).unwrap();
         if(data.message === 'success'){
           socket.auth = { id:data.user._id, username:data.user.username };
@@ -67,12 +74,15 @@ const Login = () => {
           if(socket.connect()){
             navigate('/chat')
           }else{
+            setLoader(false)
             setError("Failed to login. Check details and try again")
           }
         }else{
-          setError("Failed to login. Check details and try again")
+            setLoader(false)
+            setError("Failed to login. Check details and try again")
         }
       }catch(err){
+        setLoader(false)
         console.log('Failed to login user: ', err)
         setError("Failed to login. Check details and try again")
       }
@@ -128,6 +138,7 @@ const Login = () => {
         {login ?
           <Box sx={{marginTop:'20%', marginRight:'12%', textAlign:'center'}}>
           {error ? <p style={{color:'red'}}>{error}</p> : ""}
+          {loader ? <CircularProgress />: ""}
            <h2 style={{color:'#444444'}}>USER LOGIN</h2>
            <i style={{position:'absolute', padding:'13px 13px 13px 25px', color:'#555555'}}><EmailIcon></EmailIcon></i>
            <input type="text" value={email} onChange={ (e) => setEmail(e.target.value)} placeholder="Email" style={{width:'60%', textAlign:'center', padding:'10px 0px 10px 20px', backgroundColor:'#dfdfdf',  fontSize:'13px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/><br/>
@@ -141,6 +152,7 @@ const Login = () => {
         : 
         <Box sx={{marginTop:'15%', marginRight:'12%', textAlign:'center'}}>
           {regerror ? <p style={{color:'red'}}>{regerror}</p> : ""}
+          {loader ? <CircularProgress />: ""}
           <h2 style={{color:'#444444'}}>CREATE ACCOUNT</h2>
           <i style={{position:'absolute', padding:'13px 13px 13px 25px', color:'#555555'}}><EmailIcon></EmailIcon></i>
           <input type="text" value={email} onChange={ (e) => setEmail(e.target.value)} placeholder="Email" style={{width:'60%', textAlign:'center', padding:'10px 0px 10px 20px', backgroundColor:'#dfdfdf',  fontSize:'13px', borderRadius:'25px', height:'30px', border:'none', marginBottom:'20px'}}/><br/>
