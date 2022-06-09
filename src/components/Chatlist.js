@@ -74,7 +74,7 @@ export default function ChatList() {
       {realUsers.map((payload, index) => {
           return (
           <div key={index}> 
-            <ListItem  onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
+            <ListItem  onClick={() => { navigate(`/chat/${payload._id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
               <ListItemAvatar>
                   <Badge sx={{
                       "& .MuiBadge-badge": {
