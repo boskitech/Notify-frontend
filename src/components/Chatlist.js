@@ -30,8 +30,9 @@ export default function ChatList() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const realUsers = activeUsers.filter(res => res.id !== user._id)
   const offlineManchis = allUsers.filter(o1 => !activeUsers.some(o2 => o1._id === o2.id))
+  const onlineManchis = allUsers.filter(o1 => activeUsers.some(o2 => o1._id === o2.id))
+  const realUsers = onlineManchis.filter(res => res._id !== user._id)
 
   useEffect(() => {
     if (status === 'idle') {
@@ -70,7 +71,7 @@ export default function ChatList() {
 
   return (
     <List sx={{borderRadius:'10px', width: '100%', bgcolor: 'background.paper' }}>
-      {activeUsers.map((payload, index) => {
+      {realUsers.map((payload, index) => {
           return (
           <div key={index}> 
             <ListItem  onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
