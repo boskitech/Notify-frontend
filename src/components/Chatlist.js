@@ -70,7 +70,7 @@ export default function ChatList() {
 
   return (
     <List sx={{borderRadius:'10px', width: '100%', bgcolor: 'background.paper' }}>
-      {realUsers.map((payload, index) => {
+      {activeUsers.map((payload, index) => {
           return (
           <div key={index}> 
             <ListItem  onClick={() => { navigate(`/chat/${payload.id}`) }} alignItems="flex-start" sx={{'&:hover': {backgroundColor:'#dedede', cursor:'pointer'},}}>
